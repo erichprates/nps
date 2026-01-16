@@ -1,8 +1,8 @@
 import { createAdminClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
 
-export default async function ShortLinkPage({ params }: { params: { code: string } }) {
-    const { code } = params;
+export default async function ShortLinkPage({ params }: { params: Promise<{ code: string }> }) {
+    const { code } = await params;
 
     // Use admin client to bypass RLS
     const supabase = await createAdminClient();
