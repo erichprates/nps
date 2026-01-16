@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { Copy, Check, Link as LinkIcon } from 'lucide-react';
+import { Copy, Check, Link as LinkIcon, Scissors, Loader2 } from 'lucide-react';
+import { generateShortLink } from '@/lib/actions';
 
 const PROJECTS = [
     'PortoBay Praia Grande',
@@ -15,10 +16,13 @@ export default function GenerateLinkPage() {
         customerEmail: '',
         customerPhone: '',
         project: PROJECTS[0],
-        experienceType: ''
+        experienceType: '',
+        surveyCategory: 'pos-venda'
     });
 
     const [generatedLink, setGeneratedLink] = useState('');
+    const [shortLink, setShortLink] = useState('');
+    const [isShortening, setIsShortening] = useState(false);
     const [copied, setCopied] = useState(false);
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,37 +39,61 @@ export default function GenerateLinkPage() {
         setFormData({ ...formData, customerPhone: value });
     };
 
-    const handleGenerate = () => {
-        // In a real app, we might want to save this "invite" state to db
-        // For now, we just encode params
-
-        // Determine base URL (localhost in dev, production url in prod)
+    const handleGenerate = async () => {
         const baseUrl = window.location.origin;
-
-        // Construct params
         const params = new URLSearchParams();
         if (formData.customerName) params.append('n', formData.customerName);
-        if (formData.project) params.append('p', formData.project); // p for project
+        if (formData.project) params.append('p', formData.project);
         if (formData.customerEmail) params.append('e', formData.customerEmail);
         if (formData.customerPhone) params.append('t', formData.customerPhone);
+        if (formData.surveyCategory === 'pre-venda') params.append('c', 'pre');
 
-        const link = `${baseUrl}/survey/share?${params.toString()}`;
-        setGeneratedLink(link);
+        const fullLongLink = `${baseUrl}/survey/share?${params.toString()}`;
+        setGeneratedLink(fullLongLink);
+        setShortLink('');
         setCopied(false);
+
+        // Auto-shorten immediately
+        setIsShortening(true);
+        try {
+            const res = await generateShortLink(fullLongLink);
+            if (res.success) {
+                setShortLink(`${baseUrl}/s/${res.code}`);
+            } else {
+                console.error("Erro ao encurtar:", res.error);
+            }
+        } catch (error) {
+            console.error("Erro de conexão ao encurtar.");
+        } finally {
+            setIsShortening(false);
+        }
     };
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(generatedLink);
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
 
     return (
         <div style={{ maxWidth: '800px' }}>
-            <h1 style={{ marginBottom: '2rem' }}>Gerar Novo Link</h1>
+            <h1 style={{ marginBottom: '2rem' }}>Gerar Link para WhatsApp</h1>
 
             <div className="card">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Tipo de Pesquisa</label>
+                        <select
+                            className="input"
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', fontWeight: 600, color: 'var(--color-primary)' }}
+                            value={formData.surveyCategory}
+                            onChange={e => setFormData({ ...formData, surveyCategory: e.target.value as any })}
+                        >
+                            <option value="pos-venda">PÓS-VENDAS</option>
+                            <option value="pre-venda">PRÉ-VENDA</option>
+                        </select>
+                    </div>
+
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Empreendimento</label>
                         <select
@@ -117,29 +145,72 @@ export default function GenerateLinkPage() {
                 </div>
 
                 <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-                    <button className="btn btn-primary" onClick={handleGenerate}>
-                        <LinkIcon size={20} style={{ marginRight: 8 }} />
-                        Gerar Link Personalizado
+                    <button className="btn btn-primary" onClick={handleGenerate} disabled={isShortening} style={{ minWidth: '220px' }}>
+                        {isShortening ? (
+                            <><Loader2 size={20} className="spin" style={{ marginRight: 8 }} /> Gerando link...</>
+                        ) : (
+                            <><LinkIcon size={20} style={{ marginRight: 8 }} /> Gerar Link Curto</>
+                        )}
                     </button>
                 </div>
 
                 {generatedLink && (
                     <div style={{ marginTop: '2rem', background: '#F8F9FA', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
-                        <p style={{ marginBottom: '0.5rem', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Link para envio:</p>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <input
-                                readOnly
-                                value={generatedLink}
-                                style={{ flex: 1, padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', background: 'white' }}
-                            />
-                            <button
-                                onClick={copyToClipboard}
-                                className="btn"
-                                style={{ background: copied ? 'var(--color-success)' : 'var(--color-primary)', color: 'white', minWidth: '120px' }}
-                            >
-                                {copied ? <><Check size={18} style={{ marginRight: 4 }} /> Copiado</> : <><Copy size={18} style={{ marginRight: 4 }} /> Copiar</>}
-                            </button>
-                        </div>
+                        {isShortening && !shortLink && (
+                            <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                <Loader2 size={32} className="spin" style={{ color: 'var(--color-primary)', marginBottom: '1rem' }} />
+                                <p style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>Encurtando link...</p>
+                            </div>
+                        )}
+
+
+
+                        {shortLink && (
+                            <>
+                                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', border: '2px solid var(--color-primary)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
+                                    <p style={{ marginBottom: '1rem', fontSize: '1rem', color: 'var(--color-primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Check size={20} /> Link Curto Pronto:
+                                    </p>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input
+                                            readOnly
+                                            value={shortLink}
+                                            style={{ flex: 1, padding: '1rem', borderRadius: '8px', border: '1px solid var(--color-primary)', background: '#F0F7FF', fontWeight: 600, fontSize: '1.1rem', color: 'var(--color-primary)' }}
+                                        />
+                                        <button
+                                            onClick={() => copyToClipboard(shortLink)}
+                                            className="btn btn-primary"
+                                            style={{ minWidth: '150px', fontSize: '1rem' }}
+                                        >
+                                            {copied ? <><Check size={20} /> Copiado</> : <><Copy size={20} /> Copiar</>}
+                                        </button>
+                                    </div>
+                                    <p style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                                        💡 Link contém todos os dados e redirecionará automaticamente.
+                                    </p>
+                                </div>
+
+                                <details style={{ borderTop: '1px solid #ddd', paddingTop: '1rem' }}>
+                                    <summary style={{ cursor: 'pointer', fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600, marginBottom: '0.75rem' }}>
+                                        Ver Link Completo (Backup)
+                                    </summary>
+                                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                                        <input
+                                            readOnly
+                                            value={generatedLink}
+                                            style={{ flex: 1, padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', background: 'white', fontSize: '0.75rem', color: '#666' }}
+                                        />
+                                        <button
+                                            onClick={() => copyToClipboard(generatedLink)}
+                                            className="btn-outline"
+                                            style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }}
+                                        >
+                                            Copiar
+                                        </button>
+                                    </div>
+                                </details>
+                            </>
+                        )}
                     </div>
                 )}
             </div>

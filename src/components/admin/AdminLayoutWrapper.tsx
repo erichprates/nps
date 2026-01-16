@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Link as LinkIcon, LogOut } from 'lucide-react';
+import { LayoutDashboard, Link as LinkIcon, LogOut, MessageSquare } from 'lucide-react';
 import styles from './AdminLayout.module.css';
 import ThemeSwitcher from '../ThemeSwitcher';
 import { useEffect, useState } from 'react';
@@ -50,6 +50,7 @@ export default function AdminLayoutWrapper({ children }: { children: React.React
 
     const navItems = [
         { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/admin/responses', label: 'Respostas', icon: MessageSquare },
         { href: '/admin/generate', label: 'Gerar Pesquisa', icon: LinkIcon },
     ];
 
@@ -80,7 +81,7 @@ export default function AdminLayoutWrapper({ children }: { children: React.React
                     </button>
 
                     {/* Logo - Centered */}
-                    <img src={logoSrc} alt="PortoBay" style={{ height: '40px', width: 'auto' }} />
+                    <img src={logoSrc} alt="PortoBay" style={{ height: '56px', width: 'auto' }} />
                 </div>
             </header>
 
@@ -91,8 +92,8 @@ export default function AdminLayoutWrapper({ children }: { children: React.React
             />
 
             <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ''}`}>
-                <div style={{ padding: '0.5rem 0', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <img src={logoSrc} alt="PortoBay" style={{ width: '140px', height: 'auto' }} />
+                <div style={{ padding: '0.5rem 0', marginBottom: '3rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <img src={logoSrc} alt="PortoBay" style={{ width: '168px', height: 'auto' }} />
                     <button
                         className="btn-outline"
                         onClick={() => setIsSidebarOpen(false)}

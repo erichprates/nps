@@ -9,42 +9,14 @@ interface OpenFeedbackStepProps {
     question: string;
     initialValue?: string;
     onBack?: () => void;
+    nextLabel?: string;
 }
 
-export default function OpenFeedbackStep({ onNext, question, initialValue = '', onBack }: OpenFeedbackStepProps) {
+export default function OpenFeedbackStep({ onNext, question, initialValue = '', onBack, nextLabel = 'Continuar' }: OpenFeedbackStepProps) {
     const [feedback, setFeedback] = useState(initialValue);
 
     return (
         <div className={styles.container}>
-            {onBack && (
-                <button
-                    onClick={onBack}
-                    style={{
-                        position: 'absolute',
-                        top: '1.5rem',
-                        left: '1.5rem',
-                        background: '#003366',
-                        color: 'white',
-                        border: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.6rem 1.2rem',
-                        borderRadius: '2rem',
-                        cursor: 'pointer',
-                        fontSize: '0.9rem',
-                        fontWeight: 600,
-                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                        zIndex: 20,
-                        transition: 'transform 0.2s'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                    <ChevronLeft size={18} />
-                    Voltar
-                </button>
-            )}
             <div className={styles.wrapper}>
                 <h2 className={styles.question}>{question}</h2>
 
@@ -56,12 +28,26 @@ export default function OpenFeedbackStep({ onNext, question, initialValue = '', 
                     autoFocus
                 />
 
-                <div className={styles.actions}>
-                    <button className="btn btn-primary" onClick={() => onNext(feedback)}>
-                        Continuar <ArrowRight size={20} style={{ marginLeft: '8px' }} />
+                <div className={styles.actions} style={{ display: 'flex', gap: '1rem', justifyContent: 'center', width: '100%' }}>
+                    {onBack && (
+                        <button
+                            onClick={onBack}
+                            className="btn btn-outline"
+                            style={{ flex: '0 0 auto', padding: '1rem 2rem', borderRadius: '12px' }}
+                        >
+                            Voltar
+                        </button>
+                    )}
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => onNext(feedback)}
+                        style={{ flex: 1, padding: '1rem', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 700 }}
+                    >
+                        {nextLabel} <ArrowRight size={20} style={{ marginLeft: '8px' }} />
                     </button>
                 </div>
             </div>
         </div>
     );
 }
+

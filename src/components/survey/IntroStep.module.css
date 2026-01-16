@@ -1,67 +1,102 @@
 .container {
-    min-height: 100vh;
+    min-height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 2rem 1.5rem;
     text-align: center;
-    background: linear-gradient(135deg, var(--color-background) 0%, #E8F0F6 100%);
+    background: transparent;
 }
 
 .logoWrapper {
-    margin-bottom: 2.5rem;
-    width: 180px;
+    margin-bottom: 3rem;
+    width: 336px;
     height: auto;
 }
 
 .card {
-    background: white;
-    padding: 3rem 2rem;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 10px 30px rgba(0, 43, 73, 0.08);
-    /* Navy shadow */
-    max-width: 500px;
+    padding: 2rem;
+    max-width: 600px;
     width: 100%;
     animation: fadeIn 0.8s ease-out;
 }
 
 .title {
     color: var(--color-primary);
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
     letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
 .description {
     color: var(--color-text-muted);
-    font-size: 1.125rem;
-    margin-bottom: 2.5rem;
+    font-size: 1.25rem;
+    margin-bottom: 3rem;
     line-height: 1.6;
 }
 
 .button {
     width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
     font-size: 1.125rem;
-    padding: 1rem;
+    padding: 1.25rem;
     background-color: var(--color-primary);
     color: white;
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s ease;
-    font-weight: 500;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    box-shadow: 0 10px 20px rgba(0, 43, 73, 0.15);
 }
 
 .button:hover {
     background-color: var(--color-primary-light);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 43, 73, 0.2);
+    box-shadow: 0 12px 24px rgba(0, 43, 73, 0.25);
+}
+
+.preVenda .title {
+    color: white;
+}
+
+.preVenda .description {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.preVenda .button {
+    background-color: white;
+    color: var(--color-primary);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.preVenda .button:hover {
+    background-color: #f0f0f0;
+}
+
+.footerText {
+    margin-top: 2rem;
+    font-size: 0.875rem;
+    color: #999;
+}
+
+.footerText {
+    margin-top: 2rem;
+    font-size: 0.875rem;
+    color: #999;
+}
+
+.preVenda .footerText {
+    color: rgba(255, 255, 255, 0.5);
 }
 
 @keyframes fadeIn {

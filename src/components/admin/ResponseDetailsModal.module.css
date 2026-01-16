@@ -55,7 +55,7 @@
 }
 
 .closeButton:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--color-surface-hover);
 }
 
 .header {
@@ -102,6 +102,48 @@
     color: var(--color-text-main);
     word-break: break-word;
     /* Prevent long text overflow */
+}
+
+.tagCloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    padding: 0.25rem 0.75rem;
+    background: rgba(96, 165, 250, 0.1);
+    color: var(--color-primary);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.negativeTag {
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+}
+
+.categoryBadge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.categoryPre {
+    background: rgba(96, 165, 250, 0.1);
+    color: var(--color-primary);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.categoryPos {
+    background: var(--color-primary);
+    color: white;
 }
 
 /* Mobile Overrides */

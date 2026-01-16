@@ -12,7 +12,8 @@ export default function DistributionPieChart({ promoters, neutrals, detractors }
     if (data.length === 0) return <p>Sem dados</p>;
 
     return (
-        <div style={{ width: '100%', height: 300 }}>
+        <div style={{ width: '100%', height: 250 }}>
+
             <ResponsiveContainer>
                 <PieChart>
                     <defs>
@@ -31,6 +32,8 @@ export default function DistributionPieChart({ promoters, neutrals, detractors }
                     </defs>
                     <Pie
                         data={data}
+                        cx="50%"
+                        cy="50%"
                         innerRadius={60}
                         outerRadius={100}
                         paddingAngle={4}
@@ -38,6 +41,7 @@ export default function DistributionPieChart({ promoters, neutrals, detractors }
                         stroke="none"
                         cornerRadius={6}
                     >
+
                         {data.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={`url(#${entry.colorId})`} />
                         ))}

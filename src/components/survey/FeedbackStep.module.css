@@ -1,13 +1,13 @@
 .container {
-    min-height: 100vh;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 2rem 1.5rem;
+    padding: 1rem;
     background-color: var(--color-background);
-    animation: slideIn 0.5s ease-out;
 }
+
 
 .wrapper {
     max-width: 600px;

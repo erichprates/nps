@@ -40,12 +40,87 @@
     background-color: var(--color-background);
 }
 
+.trPromoter {
+    background-color: rgba(16, 185, 129, 0.05);
+    /* Light green */
+}
+
+.trNeutral {
+    background-color: rgba(245, 158, 11, 0.05);
+    /* Light yellow */
+}
+
+.trDetractor {
+    background-color: rgba(239, 68, 68, 0.05);
+    /* Light red */
+}
+
+.trPromoter:hover {
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+.trNeutral:hover {
+    background-color: rgba(245, 158, 11, 0.1);
+}
+
+.trDetractor:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
 .scoreBadge {
     padding: 0.25rem 0.75rem;
     border-radius: 999px;
     font-weight: 600;
     font-size: 0.875rem;
     display: inline-block;
+}
+
+.categoryBadge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.categoryPre {
+    background: rgba(96, 165, 250, 0.1);
+    color: var(--color-primary);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.categoryPos {
+    background: var(--color-primary);
+    color: white;
+}
+
+.totemBadge {
+    background: #4F46E5;
+    color: white;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Column specific */
+.colCategory {
+    width: 140px;
+}
+
+.desktopOnly {
+    display: table-cell;
+}
+
+.categoryBadgeMobile {
+    display: none;
 }
 
 .actionBtn {
@@ -64,13 +139,26 @@
 }
 
 .actionBtn:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--color-surface-hover);
 }
 
 
 
+.clientBadgeContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 /* Mobile Compact View */
 @media (max-width: 768px) {
+    .clientBadgeContainer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
     .thead {
         display: none;
     }
@@ -105,6 +193,15 @@
         display: none;
     }
 
+    .desktopOnly {
+        display: none;
+    }
+
+    .categoryBadgeMobile {
+        display: block;
+        margin-top: 2px;
+    }
+
     /* Specific Column Styles */
     .colDate {
         font-size: 0.7rem;
@@ -119,6 +216,15 @@
         overflow: hidden;
         text-overflow: ellipsis;
         min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .categoryBadgeMobile {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.3rem;
+        width: fit-content;
     }
 
     .colWhatsapp {

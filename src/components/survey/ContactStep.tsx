@@ -6,9 +6,11 @@ import { User, Mail, Phone, ArrowRight } from 'lucide-react';
 
 interface ContactStepProps {
     onNext: (data: { name: string, email: string, phone: string }) => void;
+    nextLabel?: string;
 }
 
-export default function ContactStep({ onNext }: ContactStepProps) {
+export default function ContactStep({ onNext, nextLabel = 'Finalizar Pesquisa' }: ContactStepProps) {
+
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
@@ -121,9 +123,10 @@ export default function ContactStep({ onNext }: ContactStepProps) {
                         gap: '0.75rem'
                     }}
                 >
-                    Finalizar Pesquisa
+                    {nextLabel}
                     <ArrowRight size={24} />
                 </motion.button>
+
 
             </motion.div>
         </div>

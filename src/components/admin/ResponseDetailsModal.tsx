@@ -3,10 +3,13 @@
 import { createPortal } from 'react-dom';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Calendar, MessageSquare, Star, Folder, Mail, Phone, Pencil, Save, Building, Loader2 } from 'lucide-react';
+import { X, User, Calendar, MessageSquare, Star, Folder, Mail, Phone, Pencil, Save, Building, Loader2, CheckCircle2, TrendingUp, AlertCircle } from 'lucide-react';
+
 import { NPSResponse } from "@/lib/types";
 import styles from './ResponseDetailsModal.module.css';
 import { updateResponse } from '@/lib/actions';
+import { calculateExperienceScore } from '@/lib/analytics';
+
 
 interface ResponseDetailsModalProps {
     response: NPSResponse | null;
@@ -26,6 +29,7 @@ export default function ResponseDetailsModal({ response, onClose }: ResponseDeta
 
     // Internal state for editing. Initialize when response changes.
     const [editForm, setEditForm] = useState({
+        name: '',
         email: '',
         phone: '',
         origin: ''
@@ -36,6 +40,7 @@ export default function ResponseDetailsModal({ response, onClose }: ResponseDeta
         if (response) {
             document.body.style.overflow = 'hidden';
             setEditForm({
+                name: response.customerName || '',
                 email: response.customerEmail !== '-' ? response.customerEmail : '',
                 phone: response.customerPhone !== '-' ? response.customerPhone : '',
                 origin: response.origin || PROJECTS[0]
@@ -55,26 +60,13 @@ export default function ResponseDetailsModal({ response, onClose }: ResponseDeta
 
         try {
             await updateResponse(response.id, {
+                name: editForm.name,
                 email: editForm.email,
                 phone: editForm.phone,
                 origin: editForm.origin
             });
 
-            // In a real app we'd optimistic update or re-fetch. 
-            // Here we assume success and update local prop 'response' visually? 
-            // Actually 'response' prop comes from parent. Parent needs to know?
-            // Since we called revalidatePath in server action, the parent List *should* refresh if we close?
-            // Or we can just close the modal to force refresh.
-            // User UX suggestion: Switch back to view mode, showing new data.
-            // But verify: we can't mutate 'response' prop directly.
-            // For now, let's close modal on success to refresh data from server?
-            // Or just keep it simple: Show 'Saved' and switch mode. 
-            // Note: Since we can't easily update the 'response' prop without parent callback, 
-            // editing visuals might revert if we don't update local state or parent.
-            // Let's force a window reload or rely on revalidate.
-            // Best UX: close modal.
             onClose();
-            // Or: window.location.reload(); // Aggressive.
 
         } catch (error) {
             alert('Erro ao salvar.');
@@ -178,56 +170,131 @@ export default function ResponseDetailsModal({ response, onClose }: ResponseDeta
                                 {response.customerName.charAt(0).toUpperCase()}
                             </div>
                             <div>
-                                <h2 style={{ fontSize: '1.25rem', margin: 0, marginBottom: '0.25rem', color: 'var(--color-text-main)', lineHeight: 1.2 }}>{response.customerName}</h2>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-                                    <Calendar size={14} />
-                                    <span>{response.date}</span>
-                                </div>
+                                {isEditing ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100%' }}>
+                                        <input
+                                            type="text"
+                                            className="input"
+                                            style={{ fontSize: '1.25rem', fontWeight: 700, padding: '0.4rem', width: '100%' }}
+                                            value={editForm.name}
+                                            onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                                            placeholder="Nome do cliente"
+                                        />
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                                            <Calendar size={14} />
+                                            <span>{response.date}</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                                            <h2 style={{ fontSize: '1.25rem', margin: 0, color: 'var(--color-text-main)', lineHeight: 1.2 }}>{response.customerName}</h2>
+                                            <span className={`${styles.categoryBadge} ${response.surveyCategory === 'pre-venda' ? styles.categoryPre : styles.categoryPos}`}>
+                                                {response.surveyCategory === 'pre-venda' ? 'PRÉ-VENDA' : 'PÓS-VENDAS'}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                                            <Calendar size={14} />
+                                            <span>{response.date}</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
 
-                        <div className={styles.statsGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))' }}>
+                        <div className={styles.statsGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', marginBottom: '1.5rem' }}>
                             <div className={styles.statCard}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-                                    <Star size={16} />
-                                    <span>Nota</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
+                                    <Star size={14} />
+                                    <span>Nota NPS</span>
                                 </div>
-                                <div style={{ fontSize: '2rem', fontWeight: 700, color: getScoreColor(response.score) }}>
+                                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: getScoreColor(response.score) }}>
                                     {response.score}
                                 </div>
                             </div>
 
-                            <div className={styles.statCard}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-                                    <Folder size={16} />
-                                    <span>Categoria</span>
+                            <div className={styles.statCard} style={{ background: response.experienceLabel === 'Encantamento' ? '#ECFDF5' : response.experienceLabel === 'Atrito' ? '#FEF2F2' : '#FFFBEB', borderColor: 'transparent' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
+                                    <TrendingUp size={14} />
+                                    <span>Termômetro</span>
                                 </div>
-                                <div style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--color-text-main)', wordBreak: 'break-word' }}>
-                                    {response.experienceType || 'N/A'}
+                                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: response.experienceLabel === 'Encantamento' ? '#059669' : response.experienceLabel === 'Atrito' ? '#DC2626' : '#D97706' }}>
+                                    {Math.min(100, response.experienceScore ?? 0)}
+                                </div>
+                                <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', opacity: 0.8 }}>
+                                    {response.experienceLabel || 'Regular'}
                                 </div>
                             </div>
 
+
                             <div className={styles.statCard}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-                                    <Building size={16} />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem', color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
+                                    <Building size={14} />
                                     <span>Empreendimento</span>
                                 </div>
                                 {isEditing ? (
                                     <select
                                         className="input"
-                                        style={{ width: '100%', fontSize: '0.9rem', padding: '0.25rem' }}
+                                        style={{ width: '100%', fontSize: '0.85rem', padding: '0.25rem' }}
                                         value={editForm.origin}
                                         onChange={e => setEditForm({ ...editForm, origin: e.target.value })}
                                     >
                                         {PROJECTS.map(p => <option key={p} value={p}>{p}</option>)}
+                                        <option value="Stand">Stand</option>
+                                        <option value="Link Direto">Link Direto</option>
                                     </select>
                                 ) : (
-                                    <div style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--color-text-main)', wordBreak: 'break-word' }}>
-                                        {response.origin || 'Link Direto'}
+                                    <div style={{
+                                        fontSize: '0.9rem',
+                                        fontWeight: 700,
+                                        color: response.origin === 'Stand' ? '#4F46E5' : 'var(--color-text-main)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                    }}>
+                                        {response.origin === 'Stand' && <CheckCircle2 size={14} />}
+                                        {response.origin || 'Direto'}
                                     </div>
                                 )}
                             </div>
                         </div>
+
+                        {/* Analysis of Contributors */}
+                        {response.experienceScore !== undefined && (
+                            <div style={{ background: '#F8FAFC', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid #E2E8F0' }}>
+                                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748B', marginBottom: '0.75rem', textTransform: 'uppercase' }}>
+                                    Análise Dinâmica de Vivência
+                                </div>
+                                {(() => {
+                                    const { factors } = calculateExperienceScore(response);
+                                    // Only show factors that actually have weight (positive or negative)
+                                    const relevantFactors = factors.filter(f => f.score !== 0);
+
+                                    if (relevantFactors.length === 0) {
+                                        return <div style={{ fontSize: '0.85rem', color: '#94A3B8' }}>Nenhum fator impactante detectado.</div>;
+                                    }
+
+                                    return (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                            {relevantFactors.map((f: any, i: number) => (
+                                                <div key={i} style={{
+                                                    display: 'flex', alignItems: 'center', gap: '0.3rem',
+                                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem',
+                                                    background: f.type === 'positive' ? '#DCFCE7' : '#FEE2E2',
+                                                    color: f.type === 'positive' ? '#166534' : '#991B1B',
+                                                    border: `1px solid ${f.type === 'positive' ? '#86EFAC' : '#FECACA'}`
+                                                }}>
+                                                    {f.type === 'positive' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
+                                                    <span>{f.name}</span>
+                                                    <span style={{ fontWeight: 800 }}>{f.score > 0 ? `+${f.score}` : f.score}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        )}
+
 
                         {/* Contact Info Section - Always visible now for editing purpose logic, or flexible */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -293,15 +360,64 @@ export default function ResponseDetailsModal({ response, onClose }: ResponseDeta
                             )}
                         </div>
 
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--color-text-main)', fontWeight: 600 }}>
+                                    <Star size={16} className="text-amber-500" />
+                                    <span>Sentimento Geral</span>
+                                </div>
+                                <div className={styles.tagCloud}>
+                                    {response.feelings && response.feelings.length > 0 ? (
+                                        response.feelings.map(f => <span key={f} className={styles.tag}>{f}</span>)
+                                    ) : <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Não informado</span>}
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--color-text-main)', fontWeight: 600 }}>
+                                    <CheckCircle2 size={16} className="text-green-500" />
+                                    <span>Pontos Fortes</span>
+                                </div>
+                                <div className={styles.tagCloud}>
+                                    {response.keyPoints && response.keyPoints.length > 0 ? (
+                                        response.keyPoints.map(p => <span key={p} className={styles.tag}>{p}</span>)
+                                    ) : <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Não informado</span>}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--color-text-main)', fontWeight: 600 }}>
+                                <TrendingUp size={16} className="text-blue-500" />
+                                <span>Expectativas vs Realidade</span>
+                            </div>
+                            <div style={{ fontSize: '0.95rem', color: 'var(--color-text-main)', padding: '0.75rem', background: '#F8FAFC', borderRadius: '8px' }}>
+                                {response.expectations || 'Não informado'}
+                            </div>
+                        </div>
+
+                        {response.improvementAreas && response.improvementAreas.length > 0 && (
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--color-text-main)', fontWeight: 600 }}>
+                                    <AlertCircle size={16} className="text-red-500" />
+                                    <span>Oportunidades de Melhoria</span>
+                                </div>
+                                <div className={styles.tagCloud}>
+                                    {response.improvementAreas.map(i => <span key={i} className={`${styles.tag} ${styles.negativeTag}`}>{i}</span>)}
+                                    {response.improvementOther && <span className={`${styles.tag} ${styles.negativeTag}`}>{response.improvementOther}</span>}
+                                </div>
+                            </div>
+                        )}
+
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--color-text-main)', fontWeight: 600 }}>
                                 <MessageSquare size={18} />
-                                <span>Feedback do Cliente</span>
+                                <span>Sugestões e Comentários</span>
                             </div>
-                            <div className={styles.feedbackContainer} style={{ fontStyle: response.comment ? 'normal' : 'italic' }}>
-                                {response.comment || response.reason || "Nenhum comentário adicional fornecido."}
+                            <div className={styles.feedbackContainer}>
+                                {response.suggestions || response.comment || response.reason || "Nenhum comentário adicional fornecido."}
                             </div>
                         </div>
+
                     </motion.div>
                 </motion.div>
             )}

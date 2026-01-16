@@ -1,10 +1,12 @@
 export type SurveyStep =
-    | 'WELCOME'
     | 'INTRO'
+    | 'WELCOME'
     | 'NPS_SCORE'
-    | 'OPEN_FEEDBACK'
-    | 'CONDITIONAL_FEEDBACK'
-    | 'EXPERIENCE_TYPE'
+    | 'FEELINGS'
+    | 'KEY_POINTS'
+    | 'EXPECTATIONS'
+    | 'IMPROVEMENTS'
+    | 'SUGGESTIONS'
     | 'CONTACT'
     | 'SUBMITTING'
     | 'THANK_YOU';
@@ -19,4 +21,13 @@ export interface SurveyState {
     customerEmail?: string;
     customerPhone?: string;
     origin?: string;
+    // New fields
+    feelings: string[];
+    keyPoints: string[];
+    expectations: string;
+    improvementAreas: string[];
+    improvementOther: string;
+    suggestions: string;
+    surveyCategory: 'pos-venda' | 'pre-venda';
 }
+

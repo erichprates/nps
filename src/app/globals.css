@@ -12,9 +12,12 @@
   /* Neutral Colors */
   --color-background: #F8F9FA;
   --color-surface: #FFFFFF;
+  --color-surface-hover: #F8F9FA;
   --color-text-main: #1A1A1A;
   --color-text-muted: #666666;
   --color-border: #E5E5E5;
+  --color-input-bg: #FFFFFF;
+  --color-muted-bg: #F1F5F9;
 
   /* Feedback Colors */
   --color-success: #10B981;
@@ -31,20 +34,23 @@
 }
 
 [data-theme='dark'] {
-  --color-primary: #1565C0;
-  /* Brighter blue for contrast on black */
-  --color-primary-light: #42A5F5;
-  --color-accent: #FFD54F;
-  /* Brighter gold */
+  --color-primary: #60A5FA;
+  /* Brighter blue for dark bg */
+  --color-primary-light: #93C5FD;
+  --color-accent: #FBBF24;
 
-  --color-background: #000000;
-  /* TRUE BLACK */
-  --color-surface: #121212;
-  /* Very dark grey for cards, effectively black with slight depth */
-  --color-text-main: #FFFFFF;
-  --color-text-muted: #D1D5DB;
-  /* Lighter gray for better readability on black */
-  --color-border: #333333;
+  --color-background: #0F172A;
+  /* Deep Navy/Black */
+  --color-surface: #1E293B;
+  /* Elevated Navy */
+  --color-surface-hover: #334155;
+  --color-text-main: #F8FAFC;
+  --color-text-muted: #94A3B8;
+  --color-border: #334155;
+
+  /* Specific for dark mode inputs/muted boxes */
+  --color-input-bg: #1E293B;
+  --color-muted-bg: #334155;
 }
 
 
@@ -60,6 +66,26 @@ body {
   font-family: var(--font-family);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 5px;
+  border: 2px solid var(--color-background);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
 }
 
 /* Utility Classes matching Design System */

@@ -35,3 +35,14 @@ export async function createServerClient() {
     });
 }
 
+// Helper for admin actions (bypassing RLS)
+export async function createAdminClient() {
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    return createClient(supabaseUrl, serviceRoleKey, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false
+        }
+    });
+}
+

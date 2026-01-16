@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NPSResponse } from "@/lib/types";
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import styles from './ResponseList.module.css';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ResponseListProps {
     data: NPSResponse[];
@@ -12,8 +13,28 @@ interface ResponseListProps {
 
 const ITEMS_PER_PAGE = 10;
 
+const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.05
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+};
+
 export default function ResponseList({ data, onSelectResponse }: ResponseListProps) {
     const [currentPage, setCurrentPage] = useState(1);
+
+    // Reset page when data changes (e.g. filter applied)
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [data]);
 
     // Sort data by date descending (newest first)
     const sortedData = [...data].reverse();
@@ -47,43 +68,76 @@ export default function ResponseList({ data, onSelectResponse }: ResponseListPro
     };
 
     return (
-        <div className={`card ${styles.container}`} style={{ display: 'flex', flexDirection: 'column' }}>
+        <motion.div
+            className={`card ${styles.container}`}
+            style={{ display: 'flex', flexDirection: 'column' }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+        >
             {data.length === 0 ? (
-                <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                <motion.div
+                    variants={itemVariants}
+                    style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-muted)' }}
+                >
                     Nenhuma resposta encontrada para este filtro.
-                </div>
+                </motion.div>
             ) : (
                 <>
-                    <div className={styles.tableContainer} style={{ flex: 1 }}>
+                    <motion.div variants={itemVariants} className={styles.tableContainer} style={{ flex: 1 }}>
                         <table className={styles.table}>
                             <thead className={styles.thead}>
                                 <tr>
                                     <th className={styles.th}>Data</th>
                                     <th className={styles.th}>Cliente</th>
+                                    <th className={styles.th}>Categoria</th>
                                     <th className={`${styles.th} ${styles.colEmail}`}>Email</th>
                                     <th className={`${styles.th} ${styles.colWhatsapp}`}>WhatsApp</th>
                                     <th className={styles.th} style={{ textAlign: 'center' }}>Nota</th>
-                                    <th className={`${styles.th} ${styles.colComment}`}>Comentário</th>
                                     <th className={styles.th} style={{ textAlign: 'right' }}>Ação</th>
                                 </tr>
                             </thead>
                             <tbody className={styles.tbody}>
                                 {currentData.map((row, i) => {
                                     const style = getScoreBadge(row.score);
-                                    // Extract just the date part (DD/MM/YYYY) if time is present
-                                    const dateOnly = row.date.split(' ')[0];
+                                    // Extract just the date part (DD/MM/YYYY) and remove any trailing commas
+                                    const dateOnly = row.date.split(' ')[0].replace(',', '');
+
+                                    const rowClass = row.score >= 9 ? styles.trPromoter : row.score <= 6 ? styles.trDetractor : styles.trNeutral;
 
                                     return (
-                                        <tr
+                                        <motion.tr
                                             key={row.id}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{
+                                                duration: 0.15,
+                                                delay: i * 0.01
+                                            }}
                                             onClick={() => onSelectResponse(row)}
-                                            className={styles.tr}
+                                            className={`${styles.tr} ${rowClass}`}
                                         >
                                             <td className={`${styles.td} ${styles.colDate}`}>
                                                 {dateOnly}
                                             </td>
-                                            <td className={`${styles.td} ${styles.colClient}`}>
-                                                {row.customerName}
+                                            <td className={`${styles.td} ${styles.colClient}`} style={{ fontWeight: 700 }}>
+                                                <div className={styles.clientBadgeContainer}>
+                                                    {row.customerName}
+                                                    {row.origin === 'Stand' && (
+                                                        <span className={styles.totemBadge}>TOTEM</span>
+                                                    )}
+                                                    {/* Mobile only badge shown below name */}
+                                                    <div className={styles.categoryBadgeMobile}>
+                                                        <span className={`${styles.categoryBadge} ${row.surveyCategory === 'pre-venda' ? styles.categoryPre : styles.categoryPos}`}>
+                                                            {row.surveyCategory === 'pre-venda' ? 'PRÉ-VENDA' : 'PÓS-VENDAS'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className={`${styles.td} ${styles.colCategory} ${styles.desktopOnly}`}>
+                                                <span className={`${styles.categoryBadge} ${row.surveyCategory === 'pre-venda' ? styles.categoryPre : styles.categoryPos}`}>
+                                                    {row.surveyCategory === 'pre-venda' ? 'PRÉ-VENDA' : 'PÓS-VENDAS'}
+                                                </span>
                                             </td>
                                             <td className={`${styles.td} ${styles.colEmail}`}>
                                                 {row.customerEmail !== '-' ? row.customerEmail : '-'}
@@ -109,27 +163,22 @@ export default function ResponseList({ data, onSelectResponse }: ResponseListPro
                                                     {row.score}
                                                 </span>
                                             </td>
-                                            <td className={`${styles.td} ${styles.colComment}`}>
-                                                <div style={{ maxWidth: '300px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-                                                    {row.comment || row.reason || '-'}
-                                                </div>
-                                            </td>
                                             <td className={`${styles.td} ${styles.colAction}`} style={{ textAlign: 'right' }}>
                                                 <button className={styles.actionBtn}>
                                                     <Search size={18} />
                                                     <span className={styles.actionText}>Detalhes</span>
                                                 </button>
                                             </td>
-                                        </tr>
+                                        </motion.tr>
                                     );
                                 })}
                             </tbody>
                         </table>
-                    </div>
+                    </motion.div>
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderTop: '1px solid var(--color-border)' }}>
+                        <motion.div variants={itemVariants} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderTop: '1px solid var(--color-border)' }}>
                             <div style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
                                 {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, data.length)} de {data.length}
                             </div>
@@ -151,10 +200,10 @@ export default function ResponseList({ data, onSelectResponse }: ResponseListPro
                                     <ChevronRight size={16} />
                                 </button>
                             </div>
-                        </div>
+                        </motion.div>
                     )}
                 </>
             )}
-        </div>
+        </motion.div>
     );
 }

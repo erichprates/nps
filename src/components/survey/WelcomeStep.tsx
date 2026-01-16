@@ -25,11 +25,18 @@ export default function WelcomeStep({ onStart }: WelcomeStepProps) {
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ type: "spring", stiffness: 100, damping: 20 }}
                 style={{ maxWidth: '600px', width: '100%' }}
             >
                 {/* Logo Placeholder - White Version */}
-                <img src="/logo-dark.svg" alt="PortoBay" style={{ height: '80px', marginBottom: '3rem', filter: 'brightness(0) invert(1)' }} />
+                <motion.img
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1, delay: 0.2 }}
+                    src="/logo-dark.svg"
+                    alt="PortoBay"
+                    style={{ height: '134px', marginBottom: '3rem', filter: 'brightness(0) invert(1)' }}
+                />
 
                 <h1 style={{
                     color: '#FFFFFF',

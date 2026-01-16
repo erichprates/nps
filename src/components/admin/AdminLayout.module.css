@@ -39,14 +39,15 @@
 }
 
 .navItem:hover {
-    background-color: #F8F9FA;
+    background-color: var(--color-surface-hover);
     color: var(--color-primary);
 }
 
 .active {
-    background-color: #E6F0F6;
-    /* Light navy tint */
+    background-color: rgba(96, 165, 250, 0.1);
+    /* Light tint based on primary */
     color: var(--color-primary);
+    font-weight: 700;
 }
 
 .mainContent {
