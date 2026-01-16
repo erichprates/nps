@@ -12,7 +12,7 @@ export const pageTransition = {
     type: "tween",
     ease: "anticipate",
     duration: 0.5
-};
+} as const;
 
 export default function AnimatedStep({ children, className }: { children: React.ReactNode, className?: string }) {
     return (

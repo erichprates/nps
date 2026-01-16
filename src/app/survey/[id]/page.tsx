@@ -1,5 +1,11 @@
+import { Suspense } from 'react';
 import SurveyContainer from "@/components/survey/SurveyContainer";
 
 export default function SurveyPage() {
-    return <SurveyContainer />;
+    return (
+        <Suspense fallback={<div>Carregando pesquisa...</div>}>
+            <SurveyContainer />
+        </Suspense>
+    );
 }
+
