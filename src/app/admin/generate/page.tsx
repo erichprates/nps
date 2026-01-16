@@ -25,22 +25,51 @@ export default function GenerateLinkPage() {
     const [isShortening, setIsShortening] = useState(false);
     const [copied, setCopied] = useState(false);
 
+    const [errors, setErrors] = useState({ email: '', phone: '' });
+
+    const validateForm = () => {
+        let isValid = true;
+        const newErrors = { email: '', phone: '' };
+
+        // Validate Email (if provided)
+        if (formData.customerEmail) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.customerEmail)) {
+                newErrors.email = 'Formato de e-mail inválido.';
+                isValid = false;
+            }
+        }
+
+        // Validate Phone (if provided)
+        // Must be exactly 15 chars: (XX) XXXXX-XXXX
+        if (formData.customerPhone) {
+            if (formData.customerPhone.length < 15) {
+                newErrors.phone = 'Digite o número completo (DDD + 9 dígitos).';
+                isValid = false;
+            }
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
+
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // ... previous logic remains
         let value = e.target.value;
-        value = value.replace(/\D/g, ''); // Remove non-digits
-
-        // Limit to 11 digits (DDD + 9 digits)
+        value = value.replace(/\D/g, '');
         if (value.length > 11) value = value.slice(0, 11);
-
-        // Apply mask (XX) XXXXX-XXXX
         value = value.replace(/^(\d{2})(\d)/, '($1) $2');
         value = value.replace(/(\d)(\d{4})$/, '$1-$2');
 
         setFormData({ ...formData, customerPhone: value });
+        if (errors.phone) setErrors({ ...errors, phone: '' }); // Clear error on change
     };
 
     const handleGenerate = async () => {
+        if (!validateForm()) return;
+
         const baseUrl = window.location.origin;
+        // ... rest of generation logic
         const params = new URLSearchParams();
         if (formData.customerName) params.append('n', formData.customerName);
         if (formData.project) params.append('p', formData.project);
@@ -126,8 +155,12 @@ export default function GenerateLinkPage() {
                             style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}
                             placeholder="cliente@email.com"
                             value={formData.customerEmail}
-                            onChange={e => setFormData({ ...formData, customerEmail: e.target.value })}
+                            onChange={e => {
+                                setFormData({ ...formData, customerEmail: e.target.value });
+                                if (errors.email) setErrors({ ...errors, email: '' });
+                            }}
                         />
+                        {errors.email && <p style={{ color: 'var(--color-danger)', fontSize: '0.8rem', marginTop: '0.25rem' }}>{errors.email}</p>}
                     </div>
 
                     <div>
@@ -141,6 +174,7 @@ export default function GenerateLinkPage() {
                             onChange={handlePhoneChange}
                             maxLength={15}
                         />
+                        {errors.phone && <p style={{ color: 'var(--color-danger)', fontSize: '0.8rem', marginTop: '0.25rem' }}>{errors.phone}</p>}
                     </div>
                 </div>
 
