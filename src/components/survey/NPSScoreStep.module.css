@@ -1,0 +1,225 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    background-color: var(--color-background);
+    animation: slideIn 0.5s ease-out;
+}
+
+.question {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--color-primary);
+    max-width: 800px;
+}
+
+.scaleGrid {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+    width: 100%;
+    /* Maximize width to fit 11 buttons * ~80px = ~900px + gaps. 1100px is safe. */
+    max-width: 1100px;
+}
+
+.scoreBtn {
+    width: 4.8rem;
+    /* Fit 11 buttons on one line (Desktop) */
+    height: 4.8rem;
+    border-radius: 50%;
+    border: 2px solid var(--color-border);
+    background: white;
+    font-weight: 600;
+    font-size: 1.75rem;
+    /* Larger font */
+    color: var(--color-text-main);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scoreBtn:hover {
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+    background-color: #f0f4f8;
+}
+
+.scoreBtn.selected {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 43, 73, 0.3);
+}
+
+/* Color grading for the scale (optional, adds nice touch) */
+/* Gradient Logic using data-score */
+
+/* 0-1 (Deep Red/Red) -> 2-3 (Light Red/Orange) -> 4-6 (Yellowish/Amber) -> 7-8 (Yellow/Greenish) -> 9-10 (Green) */
+
+/* Detractors (0-6) - Red to Amber Gradient */
+.scoreBtn[data-score="0"] {
+    --btn-color: #EF4444;
+    --btn-bg: #FEF2F2;
+}
+
+.scoreBtn[data-score="1"] {
+    --btn-color: #EF4444;
+    --btn-bg: #FFF1F2;
+}
+
+.scoreBtn[data-score="2"] {
+    --btn-color: #F87171;
+    --btn-bg: #FFF4F4;
+}
+
+.scoreBtn[data-score="3"] {
+    --btn-color: #F87171;
+    --btn-bg: #FFF5F5;
+}
+
+.scoreBtn[data-score="4"] {
+    --btn-color: #FB923C;
+    --btn-bg: #FFF7ED;
+}
+
+.scoreBtn[data-score="5"] {
+    --btn-color: #FB923C;
+    --btn-bg: #FFF7ED;
+}
+
+.scoreBtn[data-score="6"] {
+    --btn-color: #FBBF24;
+    --btn-bg: #FFFBEB;
+}
+
+/* Neutrals (7-8) - Amber/Yellow */
+.scoreBtn[data-score="7"] {
+    --btn-color: #F59E0B;
+    --btn-bg: #FFFBEB;
+}
+
+.scoreBtn[data-score="8"] {
+    --btn-color: #F59E0B;
+    --btn-bg: #FEFCE8;
+}
+
+/* Promoters (9-10) - Green */
+.scoreBtn[data-score="9"] {
+    --btn-color: #10B981;
+    --btn-bg: #ECFDF5;
+}
+
+.scoreBtn[data-score="10"] {
+    --btn-color: #059669;
+    --btn-bg: #D1FAE5;
+}
+
+/* Apply variable colors */
+.scoreBtn {
+    background-color: var(--btn-bg);
+    color: var(--color-text-main);
+    /* Keep text dark for contrast on pastel, or use main text */
+    border-color: transparent;
+    /* Remove border for cleaner look */
+    /* Size is set in .scoreBtn above, no need to overwrite unless specific override */
+}
+
+.scoreBtn:hover {
+    border-color: var(--btn-color);
+    transform: scale(1.1);
+    background-color: var(--btn-bg);
+    /* Keep base color */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.scoreBtn.selected {
+    background-color: var(--btn-color);
+    /* Proper solid color when selected */
+    color: white;
+    border-color: var(--btn-color);
+    transform: scale(1.15);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.scoreBtn[data-score]:hover,
+.scoreBtn[data-score].selected {
+    border-color: var(--btn-color);
+}
+
+.scoreBtn[data-score].selected {
+    background-color: var(--btn-color);
+}
+
+.labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    padding: 0 1rem;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Mobile Optimization */
+@media (max-width: 600px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .question {
+        font-size: 1.25rem;
+        margin-bottom: 2.5rem;
+        /* More space */
+    }
+
+    .scaleGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        /* 3 columns for big buttons: 0-2, 3-5, 6-8, 9-10 center? */
+        /* Actually simpler: Flex wrap with large basis */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.75rem;
+        width: 100%;
+        max-width: 400px;
+        /* Constrain width to force wrapping nicely */
+    }
+
+    .scoreBtn {
+        width: 4.5rem;
+        /* Big touch targets */
+        height: 4.5rem;
+        font-size: 1.5rem;
+        flex: 0 0 auto;
+    }
+
+    .labels {
+        font-size: 0.8rem;
+        padding: 0 1rem;
+        margin-top: 1rem;
+    }
+}

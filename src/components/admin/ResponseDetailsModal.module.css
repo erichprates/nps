@@ -1,0 +1,154 @@
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    backdrop-filter: blur(4px);
+    /* Flex centering magic */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    /* Safe area from edges */
+}
+
+.modal {
+    position: relative;
+    /* Not fixed anymore */
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 2rem;
+    z-index: 50;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    /* Dimensions */
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    /* Keep some space vertical */
+    overflow-y: auto;
+    /* Scroll inside if tall */
+
+    display: flex;
+    flex-direction: column;
+}
+
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--color-surface);
+    /* Ensure visibility over content */
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    z-index: 10;
+}
+
+.closeButton:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    /* Avoid overlap with close button */
+}
+
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--color-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.statsGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.statCard {
+    flex: 1 1 200px;
+    background: var(--color-background);
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+.feedbackContainer {
+    background: var(--color-background);
+    padding: 1.5rem;
+    border-radius: 12px;
+    line-height: 1.6;
+    color: var(--color-text-main);
+    word-break: break-word;
+    /* Prevent long text overflow */
+}
+
+/* Mobile Overrides */
+@media (max-width: 600px) {
+    .modal {
+        padding: 1.5rem;
+        /* Slightly more breathable than 1.25 but less than 2 */
+        border-radius: 16px;
+        /* Width is handled by flex parent padding + width: 100% */
+    }
+
+    .header {
+        margin-bottom: 1.5rem;
+        gap: 0.75rem;
+        padding-right: 0;
+        /* Close button is top right, header is below it effectively? no side by side */
+        padding-top: 1rem;
+        /* Space for close button if overlapping */
+    }
+
+    .avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 1.25rem;
+    }
+
+    .closeButton {
+        top: 0.75rem;
+        right: 0.75rem;
+        background: rgba(0, 0, 0, 0.05);
+        /* Slight bg so it pops */
+    }
+
+    .statsGrid {
+        margin-bottom: 1.5rem;
+        gap: 0.75rem;
+        flex-direction: column;
+        /* Force stack on really small screens if needed, but wrap is usually enough */
+    }
+
+    .statCard {
+        flex: 1 1 100%;
+        /* Force full width on mobile stack for consistency */
+    }
+
+    .feedbackContainer {
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+}

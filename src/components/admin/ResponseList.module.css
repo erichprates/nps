@@ -1,0 +1,147 @@
+.container {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+}
+
+.td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-main);
+}
+
+.tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tr:hover {
+    background-color: var(--color-background);
+}
+
+.scoreBadge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-block;
+}
+
+.actionBtn {
+    background: transparent;
+    border: none;
+    color: var(--color-primary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.actionBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+
+
+/* Mobile Compact View */
+@media (max-width: 768px) {
+    .thead {
+        display: none;
+    }
+
+    .tr {
+        display: grid;
+        /* Grid layout: Date | Client | WhatsApp | Score | Action */
+        grid-template-columns: auto 1fr auto auto auto;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 0.5rem;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .tr:last-child {
+        border-bottom: none;
+    }
+
+    .td {
+        padding: 0;
+        border: none;
+        background: transparent;
+    }
+
+    /* Hide specific columns/elements */
+    .colComment,
+    .colEmail {
+        display: none;
+    }
+
+    .actionText {
+        display: none;
+    }
+
+    /* Specific Column Styles */
+    .colDate {
+        font-size: 0.7rem;
+        color: var(--color-text-muted);
+        white-space: nowrap;
+    }
+
+    .colClient {
+        font-size: 0.85rem;
+        font-weight: 600 !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+    }
+
+    .colWhatsapp {
+        font-size: 0.75rem;
+    }
+
+    .colScore {
+        display: flex;
+        align-items: center;
+    }
+
+    .scoreBadge {
+        padding: 0.15rem 0.4rem;
+        font-size: 0.75rem;
+    }
+
+    .colAction {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .actionBtn {
+        padding: 0.25rem;
+        color: var(--color-text-muted);
+    }
+}
