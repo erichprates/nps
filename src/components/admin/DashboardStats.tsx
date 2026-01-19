@@ -59,6 +59,7 @@ export default function DashboardStats({ data, selectedFilter, onFilterSelect }:
     const [showInsights, setShowInsights] = useState(true);
     const [showNPSRule, setShowNPSRule] = useState(false);
     const [showExpRule, setShowExpRule] = useState(false);
+    const [showScaleRule, setShowScaleRule] = useState(false);
 
     const filteredByCategory = useMemo(() => {
         if (surveyCategory === 'geral') return data;
@@ -587,7 +588,7 @@ export default function DashboardStats({ data, selectedFilter, onFilterSelect }:
                 </div>
 
                 {/* Thermometer Accordion */}
-                <div>
+                <div style={{ borderBottom: '1px solid var(--color-border)' }}>
                     <div
                         onClick={() => setShowExpRule(!showExpRule)}
                         style={{
@@ -637,6 +638,69 @@ export default function DashboardStats({ data, selectedFilter, onFilterSelect }:
                                             <div>
                                                 <strong>Atrito (40 ou menos)</strong>
                                                 <p>Jornada comprometida ou presença de falhas críticas de comunicação.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* NPS Scale Reference Accordion */}
+                <div>
+                    <div
+                        onClick={() => setShowScaleRule(!showScaleRule)}
+                        style={{
+                            padding: '1.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            cursor: 'pointer',
+                            background: showScaleRule ? '#F8FAFC' : 'transparent',
+                            transition: 'background 0.2s'
+                        }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div className={styles.infoBadge} style={{ background: '#6366f1' }}>Escala</div>
+                            <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Escala de referência do NPS</h3>
+                        </div>
+                        {showScaleRule ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </div>
+
+                    <AnimatePresence>
+                        {showScaleRule && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                style={{ overflow: 'hidden' }}
+                            >
+                                <div style={{ padding: '0 1.5rem 1.5rem 1.5rem' }}>
+                                    <div className={styles.infoGrid}>
+                                        <div className={styles.infoItem}>
+                                            <div className={styles.statusDot} style={{ background: '#10B981' }}></div>
+                                            <div>
+                                                <strong>Excelente - Zona de Excelência (75 a 100)</strong>
+                                            </div>
+                                        </div>
+                                        <div className={styles.infoItem}>
+                                            <div className={styles.statusDot} style={{ background: '#3B82F6' }}></div>
+                                            <div>
+                                                <strong>Muito Bom - Zona de Qualidade (50 a 74)</strong>
+                                            </div>
+                                        </div>
+                                        <div className={styles.infoItem}>
+                                            <div className={styles.statusDot} style={{ background: '#F59E0B' }}></div>
+                                            <div>
+                                                <strong>Razoável - Zona de Aperfeiçoamento (0 a 49)</strong>
+                                            </div>
+                                        </div>
+                                        <div className={styles.infoItem}>
+                                            <div className={styles.statusDot} style={{ background: '#EF4444' }}></div>
+                                            <div>
+                                                <strong>Ruim - Zona Crítica (-100 a -1)</strong>
                                             </div>
                                         </div>
                                     </div>
